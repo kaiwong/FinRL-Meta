@@ -213,7 +213,7 @@ class StockTradingEnv(gym.Env):
                 - self.initial_amount
             )
             df_total_value.columns = ["account_value"]
-            df_total_value["date"] = self.date_memory
+            df_total_value["time"] = self.date_memory
             df_total_value["daily_return"] = df_total_value["account_value"].pct_change(
                 1
             )
@@ -225,7 +225,7 @@ class StockTradingEnv(gym.Env):
                 )
             df_rewards = pd.DataFrame(self.rewards_memory)
             df_rewards.columns = ["account_rewards"]
-            df_rewards["date"] = self.date_memory[:-1]
+            df_rewards["time"] = self.date_memory[:-1]
             if self.episode % self.print_verbosity == 0:
                 print(f"day: {self.day}, episode: {self.episode}")
                 print(f"begin_total_asset: {self.asset_memory[0]:0.2f}")
@@ -448,9 +448,9 @@ class StockTradingEnv(gym.Env):
 
     def _get_date(self):
         if len(self.df.tic.unique()) > 1:
-            date = self.data.date.unique()[0]
+            date = self.data.time.unique()[0]
         else:
-            date = self.data.date
+            date = self.data.time
         return date
 
     def save_asset_memory(self):
@@ -458,7 +458,7 @@ class StockTradingEnv(gym.Env):
         asset_list = self.asset_memory
 
         df_account_value = pd.DataFrame(
-            {"date": date_list, "account_value": asset_list}
+            {"time": date_list, "account_value": asset_list}
         )
         return df_account_value
 
@@ -467,17 +467,17 @@ class StockTradingEnv(gym.Env):
             # date and close price length must match actions length
             date_list = self.date_memory[:-1]
             df_date = pd.DataFrame(date_list)
-            df_date.columns = ["date"]
+            df_date.columns = ["time"]
 
             action_list = self.actions_memory
             df_actions = pd.DataFrame(action_list)
             df_actions.columns = self.data.tic.values
-            df_actions.index = df_date.date
+            df_actions.index = df_date.time
             # df_actions = pd.DataFrame({'date':date_list,'actions':action_list})
         else:
             date_list = self.date_memory[:-1]
             action_list = self.actions_memory
-            df_actions = pd.DataFrame({"date": date_list, "actions": action_list})
+            df_actions = pd.DataFrame({"time": date_list, "actions": action_list})
         return df_actions
 
     def _seed(self, seed=None):
